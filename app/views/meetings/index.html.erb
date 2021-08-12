@@ -1,35 +1,25 @@
-<p id="notice"><%= notice %></p>
-
 <h1>週間予定表</h1>
-
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Start time</th>
-      <th>Content</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @meetings.each do |meeting| %>
-      <tr>
-        <td><%= meeting.name %></td>
-        <td><%= meeting.start_time %></td>
-        <td><%= meeting.content %></td>
-        <td><%= link_to 'Show', meeting %></td>
-        <td><%= link_to 'Edit', edit_meeting_path(meeting) %></td>
-        <td><%= link_to 'Destroy', meeting, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
+<%= form_for :meeting, url: update_week_meetings_path, html: { method: :post } do %>
+  <%= week_calendar do |date| %>
+    <%= date %>
+    <% meeting = @meetings.find_or_initialize_by(start_time: date) %>
+    <% if meeting.id.nil? %>
+      <p>
+        <%= hidden_field_tag "meeting[#{date}][start_time]", date %>
+      </p>
+      <p>
+        <%= text_field_tag "meeting[#{date}][content]" %>
+      </p>
+    <% else %>
+      <%= fields_for "meeting[]", meeting do |meeting_fields| %>
+        <p>
+          <%= meeting_fields.hidden_field :start_time %>
+        </p>
+        <p>
+          <%= meeting_fields.text_field :content %>
+        </p>
+      <% end %>
     <% end %>
-  </tbody>
-</table>
-
-<br>
-
-<%= link_to 'New Meeting', new_meeting_path %>
-
-<%= week_calendar do |date| %>
-  <%= date %>
-<%end%>
+  <% end %>
+  <%= submit_tag("記入") %>
+<% end %>

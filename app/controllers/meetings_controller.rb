@@ -56,6 +56,14 @@ class MeetingsController < ApplicationController
     end
   end
 
+  def update_week
+    week_meetings_params.keys.each do |key|
+      @meeting = Meeting.find_or_initialize_by(start_time: week_meetings_params[key][:start_time].to_date)
+      @meeting.update_attributes(week_meetings_params[key])
+    end
+    redirect_to meetings_path
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_meeting
@@ -65,5 +73,9 @@ class MeetingsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def meeting_params
       params.require(:meeting).permit(:name, :start_time, :content)
+    end
+
+    def week_meetings_params
+      params.require(:meeting).permit!
     end
 end
